@@ -85,8 +85,15 @@ export default function install (Vue, options) {
 
   function initScrollSections (el, selector) {
     const id = scrollSpyId(el)
-    const idScrollSections = findElements(el, selector)
+    const idScrollSections = findElements(el)
     scrollSpySections[id] = idScrollSections
+
+    if (selector) {
+      const dom = document.querySelector(selector)
+      el[scrollSpyContext].eventEl = dom
+      el[scrollSpyContext].scrollEl = dom
+      return
+    }
 
     if (idScrollSections[0] && idScrollSections[0].offsetParent !== el) {
       el[scrollSpyContext].eventEl = window
@@ -193,16 +200,16 @@ export default function install (Vue, options) {
 
       scrollSpyElements[id] = el
     },
-    inserted: function (el) {
-      initScrollSections(el)
+    inserted: function (el, binding) {
+      initScrollSections(el, binding.value.container)
 
       const {eventEl, onScroll} = el[scrollSpyContext]
       eventEl.addEventListener('scroll', onScroll)
 
       onScroll()
     },
-    componentUpdated: function (el) {
-      initScrollSections(el)
+    componentUpdated: function (el, binding) {
+      initScrollSections(el, binding.value.container)
 
       const {onScroll} = el[scrollSpyContext]
 
